@@ -479,3 +479,4 @@ const sampleProducts = [
       quantity: 80,
     },
   ];
+  module.exports = sampleProducts;

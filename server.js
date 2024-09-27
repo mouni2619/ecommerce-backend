@@ -14,15 +14,19 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 const insertSampleProducts = async () => {
   try {
-    const existingProducts = await Product.countDocuments();
-    if (existingProducts === 0) {
-      await Product.insertMany(sampleProducts);
-      console.log('Sample products inserted');
+    const existingProductsCount = await Product.countDocuments();
+    console.log(`Existing products in DB: ${existingProductsCount}`);
+
+    if (existingProductsCount === 0) {
+      console.log('Inserting sample products:', sampleProducts);
+      const insertedProducts = await Product.insertMany(sampleProducts);
+      console.log('Sample products inserted:', insertedProducts);
     } else {
       console.log('Products already exist in the database');
     }
@@ -36,6 +40,7 @@ app.get('/api/products', async (req, res) => {
     const products = await Product.find();
     res.json(products);
   } catch (err) {
+    console.error('Error fetching products:', err); 
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
